@@ -213,9 +213,16 @@ DEFINE_GRADIENT_PALETTE(soundlevel_gp) {
   100,  255,  255,  0,  // yellow
   150,  255,  100,  0,  // orange
   200,  255,  50,   0,  // red
-  255,  255,  0,    0   // red
+  255,  255,  0,    0,   // red
 };
 CRGBPalette32 myPal = soundlevel_gp;
+
+CRGBPalette16 firePalette = CRGBPalette16(
+  CRGB::Orange, // оранжевый
+  CRGB::Red,    // красный
+  CRGB::Yellow, // желтый
+  CRGB::White    // белый
+);
 
 int Rlenght, Llenght;
 float RsoundLevel, RsoundLevel_f;
@@ -504,12 +511,12 @@ void animation() {
     case 0:
       count = 0;
       for (int i = (MAX_CH - 1); i > ((MAX_CH - 1) - Rlenght); i--) {
-        leds[i] = ColorFromPalette(myPal, (count * index));   // заливка по палитре " от зелёного к красному"
+        leds[i] = ColorFromPalette(myPal, (count * index) - count );   // заливка по палитре " от зелёного к красному"
         count++;
       }
       count = 0;
       for (int i = (MAX_CH); i < (MAX_CH + Llenght); i++ ) {
-        leds[i] = ColorFromPalette(myPal, (count * index));   // заливка по палитре " от зелёного к красному"
+        leds[i] = ColorFromPalette(myPal, (count * index) - count);   // заливка по палитре " от зелёного к красному"
         count++;
       }
       if (EMPTY_BRIGHT > 0) {
