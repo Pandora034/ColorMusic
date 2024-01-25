@@ -63,11 +63,30 @@ void VUAnimation() {
     rainbow_timer = millis();
     counter += 20;
   }
-  
+
+  byte c = 0;
   for (int i = (MAX_CH); i < (MAX_CH + Llenght); i++ ) {
     leds[i] = getFireColor((inoise8(i * FIRE_STEP, counter)));
   }
+
   
+  int mid = NUM_LEDS / 2;
+  for (int i = 0; i < mid; i++) {
+    CRGB color = leds[NUM_LEDS - i - 1];
+    leds[i] = color;
+  }
+//-----------------------------ПОНИЖЕНИЕ ЯРКОСТИ ПОСЛЕДНИХ СВЕТОДИОДОВ----------------------------
+  int i = MAX_CH + Llenght - 3;
+  leds[i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.2);
+  leds[++i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.1);
+  leds[++i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.03);
+
+  i = (MAX_CH - 1) - Rlenght + 4;
+  leds[i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.2);
+  leds[--i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.1);
+  leds[--i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.03);
+//------------------------------------------------------------------------------------------------
+
   if (EMPTY_BRIGHT > 0) {
     CHSV this_dark = CHSV(EMPTY_COLOR, 255, EMPTY_BRIGHT);
     for (int i = ((MAX_CH - 1) - Rlenght); i > 0; i--)
