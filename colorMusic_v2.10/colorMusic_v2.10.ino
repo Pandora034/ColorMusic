@@ -534,28 +534,28 @@ void animation() {
     case 1:
       switch (vu_mode) {
         case 0:
-          VUAnimation();
+          VUAnimation(RainbowColors_p); 
           break;
         case 1:
-          VUAnimation(RainbowStripeColors_p);
+          VUAnimation(0); // начальный цвет огня (0 красный, 80 зелёный, 140 молния, 190 розовый)
           break;
         case 2:
-          VUAnimation(PartyColors_p);
+          VUAnimation(80);
           break;
         case 3:
-          VUAnimation(LavaColors_p);
+          VUAnimation(40);
           break;
         case 4:
-          VUAnimation(OceanColors_p);
+          VUAnimation(140);
           break;
         case 5:
-          VUAnimation(CloudColors_p);
+          VUAnimation(120);
           break;
         case 6:
-          VUAnimation(ForestColors_p);
+          VUAnimation(190);
           break;
         case 7:
-          VUAnimation(HeatColors_p);
+          VUAnimation(160);
           break;
       }
 
