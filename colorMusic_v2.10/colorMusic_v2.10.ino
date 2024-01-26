@@ -63,8 +63,6 @@ float RAINBOW_STEP = 5.00;         // шаг изменения цвета ра�
 #define MONO 1                    // 1 - только один канал (ПРАВЫЙ!!!!! SOUND_R!!!!!), 0 - два канала
 #define EXP 1.4                   // степень усиления сигнала (для более "резкой" работы) (по умолчанию 1.4)
 #define POTENT 1                 // 1 - используем потенциометр, 0 - используется внутренний источник опорного напряжения 1.1 В
-byte EMPTY_BRIGHT = 10;           // яркость "не горящих" светодиодов (0 - 255)
-#define EMPTY_COLOR HUE_AQUA    // цвет "не горящих" светодиодов. Будет чёрный, если яркость 0
 
 // ----- нижний порог шумов
 uint16_t LOW_PASS = 100;          // нижний порог шумов режим VU, ручная настройка
@@ -77,6 +75,14 @@ uint16_t SPEKTR_LOW_PASS = 40;    // нижний порог шумов режи
 // ----- режим шкала громкости
 float SMOOTH = 0.3;               // коэффициент плавности анимации VU (по умолчанию 0.5)
 #define MAX_COEF 1.8              // коэффициент громкости (максимальное равно срднему * этот коэф) (по умолчанию 1.8)
+
+// ----- режим шкала громкости (Перлин)
+#define HUE_GAP 21      // заброс по hue
+#define FIRE_STEP 35    // шаг огня
+#define MIN_BRIGHT 30   // мин. яркость огня
+#define MAX_BRIGHT 255  // макс. яркость огня
+//#define MIN_SAT 200     // мин. насыщенность
+#define MAX_SAT 255     // макс. насыщенность
 
 // ----- режим цветомузыки
 float SMOOTH_FREQ = 0.8;          // коэффициент плавности анимации частот (по умолчанию 0.8)
@@ -107,11 +113,6 @@ byte RUNNING_SPEED = 11;
 byte HUE_START = 0;
 byte HUE_STEP = 5;
 #define LIGHT_SMOOTH 2
-
-// ----- режим громкости новый
-
-
-
 /*
   Цвета для HSV
   HUE_RED
@@ -221,12 +222,15 @@ DEFINE_GRADIENT_PALETTE(soundlevel_gp) {
 };
 CRGBPalette32 myPal = soundlevel_gp;
 
+byte EMPTY_BRIGHT = 10;           // яркость "не горящих" светодиодов (0 - 255)
+HSVHue EMPTY_COLOR = HUE_AQUA;   // цвет "не горящих" светодиодов. Будет чёрный, если яркость 0
+
 CRGBPalette16 firePalette = CRGBPalette16(
-  CRGB::Orange, // оранжевый
-  CRGB::Red,    // красный
-  CRGB::Yellow, // желтый
-  CRGB::White    // белый
-);
+                              CRGB::Orange, // оранжевый
+                              CRGB::Red,    // красный
+                              CRGB::Yellow, // желтый
+                              CRGB::White    // белый
+                            );
 
 int Rlenght, Llenght;
 float RsoundLevel, RsoundLevel_f;
@@ -239,6 +243,7 @@ int hue;
 unsigned long main_timer, hue_timer, strobe_timer, running_timer, color_timer, rainbow_timer, eeprom_timer, perlin_timer;
 float averK = 0.006;
 byte count;
+int counter = 0;
 float index = (float)255 / MAX_CH;   // коэффициент перевода для палитры
 boolean lowFlag;
 byte low_pass;
@@ -257,9 +262,6 @@ float freq_max_f, rainbow_steps;
 int freq_f[32];
 int this_color;
 boolean running_flag[3], eeprom_flag;
-
-unsigned int timer_arr_int[7];
-unsigned int milli; 
 
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
@@ -346,6 +348,7 @@ void setup() {
   Serial.print(F("HUE_STEP = ")); Serial.println(HUE_STEP);
   Serial.print(F("EMPTY_BRIGHT = ")); Serial.println(EMPTY_BRIGHT);
   Serial.print(F("ONstate = ")); Serial.println(ONstate);
+  Serial.print(F("vu_mode = ")); Serial.println(vu_mode);
 #endif
 }
 
@@ -513,6 +516,7 @@ void animation() {
   // согласно режиму
   switch (this_mode) {
     case 0:
+      EMPTY_COLOR = HUE_AQUA;
       count = 0;
       for (int i = (MAX_CH - 1); i > ((MAX_CH - 1) - Rlenght); i--) {
         leds[i] = ColorFromPalette(myPal, (count * index) - count );   // заливка по палитре " от зелёного к красному"
@@ -533,29 +537,40 @@ void animation() {
       break;
     case 1:
       switch (vu_mode) {
+        /*
+          Цвета для HSV
+          HUE_RED
+          HUE_ORANGE
+          HUE_YELLOW
+          HUE_GREEN
+          HUE_AQUA
+          HUE_BLUE
+          HUE_PURPLE
+          HUE_PINK
+        */
         case 0:
-          VUAnimation(RainbowColors_p); 
+          VUAnimation(RainbowColors_p, HUE_AQUA);
           break;
         case 1:
-          VUAnimation(0); // начальный цвет огня (0 красный, 80 зелёный, 140 молния, 190 розовый)
+          VUAnimation(0, HUE_RED); // начальный цвет огня (0 красный, 80 зелёный, 140 молния, 190 розовый)
           break;
         case 2:
-          VUAnimation(80);
+          VUAnimation(80, HUE_GREEN);
           break;
         case 3:
-          VUAnimation(40);
+          VUAnimation(40, HUE_ORANGE);
           break;
         case 4:
-          VUAnimation(140);
+          VUAnimation(140, HUE_BLUE);
           break;
         case 5:
-          VUAnimation(120);
+          VUAnimation(120, HUE_AQUA);
           break;
         case 6:
-          VUAnimation(190);
+          VUAnimation(190, HUE_PINK);
           break;
         case 7:
-          VUAnimation(160);
+          VUAnimation(160, HUE_PURPLE);
           break;
       }
 
@@ -970,6 +985,7 @@ void updateEEPROM() {
   EEPROM.updateInt(52, RUNNING_SPEED);
   EEPROM.updateInt(56, HUE_STEP);
   EEPROM.updateInt(60, EMPTY_BRIGHT);
+  EEPROM.updateByte(80, vu_mode);
   if (KEEP_STATE) EEPROM.updateByte(64, ONstate);
 }
 void readEEPROM() {
@@ -991,6 +1007,7 @@ void readEEPROM() {
   RUNNING_SPEED = EEPROM.readInt(52);
   HUE_STEP = EEPROM.readInt(56);
   EMPTY_BRIGHT = EEPROM.readInt(60);
+  vu_mode = EEPROM.readByte(80);
   if (KEEP_STATE) ONstate = EEPROM.readByte(64);
 }
 void eepromTick() {
