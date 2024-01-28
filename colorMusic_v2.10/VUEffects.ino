@@ -32,7 +32,7 @@ void VUAnimation(CRGBPalette16 palette, HSVHue empty_color) {
 }
 
 
-CRGB getFireColor(int val, int hue_s) {
+CRGB getFireColorForVU(int val, int hue_s) {
   int min_sat = map(Llenght, 0, MAX_CH, 250, 150);
   // чем больше val, тем сильнее сдвигается цвет, падает насыщеность и растёт яркость
   return CHSV(
@@ -51,33 +51,42 @@ void VUAnimation(int hue_s, HSVHue empty_color) {
     EMPTY_COLOR = empty_color;
   }
 
-  /*for (int i = (MAX_CH); i < (MAX_CH + Llenght); i++ ) {
-    leds[i] = getFireColor((inoise8(i * FIRE_STEP, counter)), hue_s);
-    }
-
-
-    int mid = NUM_LEDS / 2;
-    for (int i = 0; i < mid; i++) {
-    CRGB color = leds[NUM_LEDS - i - 1];
-    leds[i] = color;
-    }*/
-
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = getFireColor((inoise8(i * FIRE_STEP, counter)), hue_s);
+    leds[i] = getFireColorForVU((inoise8(i * FIRE_STEP, counter)), hue_s);
   }
 
   reducingBrightness();
 
+
+  CHSV this_dark = CHSV(EMPTY_COLOR, 255, EMPTY_BRIGHT);
+  for (int i = ((MAX_CH - 1) - Rlenght); i >= 0; i--)
+    leds[i] = this_dark;
+  for (int i = MAX_CH + Llenght; i < NUM_LEDS; i++)
+    leds[i] = this_dark;
+
+}
+
+//------------------------------------------------------------------------------------------------
+
+void VUStaticAnimation() {
+  count = 0;
+  for (int i = (MAX_CH - 1); i > ((MAX_CH - 1) - Rlenght); i--) {
+    leds[i] = ColorFromPalette(myPal, (count * index) - count );   // заливка по палитре " от зелёного к красному"
+    count++;
+  }
+  count = 0;
+  for (int i = (MAX_CH); i < (MAX_CH + Llenght); i++ ) {
+    leds[i] = ColorFromPalette(myPal, (count * index) - count);   // заливка по палитре " от зелёного к красному"
+    count++;
+  }
   if (EMPTY_BRIGHT > 0) {
     CHSV this_dark = CHSV(EMPTY_COLOR, 255, EMPTY_BRIGHT);
-    for (int i = ((MAX_CH - 1) - Rlenght); i >= 0; i--)
+    for (int i = ((MAX_CH - 1) - Rlenght); i > 0; i--)
       leds[i] = this_dark;
     for (int i = MAX_CH + Llenght; i < NUM_LEDS; i++)
       leds[i] = this_dark;
   }
 }
-
-//------------------------------------------------------------------------------------------------
 
 //-----------------------------ПОНИЖЕНИЕ ЯРКОСТИ ПОСЛЕДНИХ СВЕТОДИОДОВ----------------------------
 
