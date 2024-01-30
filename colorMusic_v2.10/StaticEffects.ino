@@ -17,12 +17,55 @@ CRGB getFireColor(int val, int hue_s) {
 }
 
 void perlin(int hue_s) {
-   if (millis() - perlin_timer > 30) {
+  uint8_t c = BACKLIGHT_PERLIN_SPEED;
+  if (millis() - perlin_timer > 30) {
     perlin_timer = millis();
-    counter += BACKLIGHT_PERLIN_SPEED;
+#if TRACKING_SILENCE == 1
+    if (silence_IR_flag) {
+      VUAnalysis();
+      c = map(Rlenght, 0, MAX_CH, BACKLIGHT_PERLIN_SPEED, BACKLIGHT_PERLIN_SPEED + 30);
+    }
+#endif
+    counter += c;
   }
   for (int i = 0; i < NUM_LEDS; i++) {
-    leds[i] = getFireColor((inoise8(i * FIRE_STEP, counter)), hue_s);
+    leds[i] = getFireColor((inoise8(i * BACKLIGHT_FIRE_STEP, counter)), hue_s);
+  }
+}
+
+void oneColor() {
+  for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(LIGHT_COLOR, LIGHT_SAT, 255);
+}
+
+void transfusionOfColors() {
+  if (millis() - color_timer > COLOR_SPEED) {
+    color_timer = millis();
+    if (++this_color > 255) this_color = 0;
+  }
+  for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(this_color, LIGHT_SAT, 255);
+}
+
+void ranningRainbow() {
+  if (millis() - rainbow_timer > 30) {
+    rainbow_timer = millis();
+#if TRACKING_SILENCE == 1
+    if (silence_IR_flag) {
+      VUAnalysis();
+      if (RAINBOW_PERIOD > 0) this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD + 3);
+      else this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD - 3);
+    }
+#endif
+    this_color += RAINBOW_PERIOD;
+
+    if (this_color > 255) this_color = 0;
+    if (this_color < 0) this_color = 255;
+  }
+  rainbow_steps = this_color;
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CHSV((int)floor(rainbow_steps), 255, 255);
+    rainbow_steps += RAINBOW_STEP_2;
+    if (rainbow_steps > 255) rainbow_steps = 0;
+    if (rainbow_steps < 0) rainbow_steps = 255;
   }
 }
 

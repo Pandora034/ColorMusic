@@ -96,10 +96,12 @@ void reducingBrightness() {
   leds[++i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.1);
   leds[++i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.03);
 
+
   i = (MAX_CH - 1) - Rlenght + 3;
   leds[i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.2);
   leds[--i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.1);
   leds[--i].setRGB(leds[i].r, leds[i].g, leds[i].b).nscale8(BRIGHTNESS * 0.03);
+
 }
 
 //------------------------------------------------------------------------------------------------

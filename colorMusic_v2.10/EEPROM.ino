@@ -33,7 +33,8 @@ void updateEEPROM() {
   EEPROM.updateByte(82, whiteKelvin_mode);
   EEPROM.updateByte(83, BACKLIGHT_PERLIN_SPEED);
   EEPROM.updateInt(87, BACKLIGHT_PERLIN_RAINBOW_SPEED);
-  EEPROM.updateInt(88, whiteLightBrightness);
+  EEPROM.updateByte(88, whiteLightBrightness);
+  EEPROM.updateByte(89, BACKLIGHT_FIRE_STEP);
   if (KEEP_STATE) EEPROM.updateByte(64, ONstate);
 }
 void readEEPROM() {
@@ -61,6 +62,7 @@ void readEEPROM() {
   BACKLIGHT_PERLIN_SPEED = EEPROM.readByte(83);
   BACKLIGHT_PERLIN_RAINBOW_SPEED = EEPROM.readInt(87);
   whiteLightBrightness = EEPROM.readByte(88);
+  BACKLIGHT_FIRE_STEP = EEPROM.readByte(89);
   if (KEEP_STATE) ONstate = EEPROM.readByte(64);
 }
 void eepromTick() {
