@@ -24,7 +24,7 @@ void remoteTick() {
         break;
       case BUTT_6: this_mode = 5;
         break;
-      case BUTT_7: this_mode = 6;
+      case BUTT_7: this_mode = 6; silence_timer = millis();
         break;
       case BUTT_8: this_mode = 7; silence_timer = millis();
         break;

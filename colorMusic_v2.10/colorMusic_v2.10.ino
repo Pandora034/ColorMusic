@@ -205,6 +205,7 @@ byte HUE_STEP = 5;
 #define MODE_AMOUNT 9      // количество режимов
 
 #define STRIPE NUM_LEDS / 5
+#define STRIPE_MOD STRIPE / 2 - 2
 float freq_to_stripe = NUM_LEDS / 40; // /2 так как симметрия, и /20 так как 20 частот
 
 #define FHT_N 64         // ширина спектра х2
@@ -281,6 +282,8 @@ uint8_t BACKLIGHT_PERLIN_SPEED, whiteLightBrightness;
 int  BACKLIGHT_PERLIN_RAINBOW_SPEED;
 uint8_t BACKLIGHT_FIRE_STEP;
 
+uint8_t freq_color[3];
+
 #define cbi(sfr, bit) (_SFR_BYTE(sfr) &= ~_BV(bit))
 #define sbi(sfr, bit) (_SFR_BYTE(sfr) |= _BV(bit))
 // ------------------------------ ДЛЯ РАЗРАБОТЧИКОВ --------------------------------
@@ -349,6 +352,10 @@ void setup() {
   if (this_mode == 0) silence_IR_flag = true;
   else silence_IR_flag = false;
 
+  for (byte i = 0; i < 3; i++){
+    freq_color[i] = random8();
+  }
+
 #if (SETTINGS_LOG == 1)
   Serial.print(F("this_mode = ")); Serial.println(this_mode);
   Serial.print(F("freq_strobe_mode = ")); Serial.println(freq_strobe_mode);
@@ -374,17 +381,17 @@ void setup() {
 }
 
 void loop() {
-  /*Serial.print(thisBright[0]);
-  Serial.print("   ");
-  Serial.print(thisBright[1]);
-  Serial.print("   ");
-  Serial.print(thisBright[2]);
-  Serial.print("   ");
-  Serial.print(colorMusicFlash[0]);
-  Serial.print("   ");
-  Serial.print(colorMusicFlash[1]);
-  Serial.print("   ");
-  Serial.println(colorMusicFlash[2]);*/
+  /*Serial.print(RsoundLevel_f);
+    Serial.print("   ");
+    Serial.println(Rlenght);
+    Serial.print("   ");
+    Serial.print(thisBright[2]);
+    Serial.print("   ");
+    Serial.print(colorMusicFlash[0]);
+    Serial.print("   ");
+    Serial.print(colorMusicFlash[1]);
+    Serial.print("   ");
+    Serial.println(colorMusicFlash[2]);*/
   buttonTick();     // опрос и обработка кнопки
 #if REMOTE_TYPE != 0
   remoteTick();     // опрос ИК пульта

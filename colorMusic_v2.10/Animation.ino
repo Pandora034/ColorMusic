@@ -128,7 +128,8 @@ void animation() {
         for (int i = 0; i < NUM_LEDS; i++) leds[i] = CHSV(EMPTY_COLOR, 255, EMPTY_BRIGHT);
       break;
     case 6:
-
+      randomColorStripe3();
+      break;
     case 7:
       switch (freq_strobe_mode) {
         case 0:

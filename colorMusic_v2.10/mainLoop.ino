@@ -26,7 +26,7 @@ void mainLoop() {
       }
 
       // 3-5 режим - цветомузыка
-      if (this_mode == 2 || this_mode == 3 || this_mode == 4 || this_mode == 7 || this_mode == 8) {
+      if (this_mode == 2 || this_mode == 3 || this_mode == 4 || this_mode == 6 || this_mode == 7 || this_mode == 8) {
 #if (TRACKING_SILENCE)
         silence(this_mode);
 #endif
@@ -61,7 +61,7 @@ void mainLoop() {
         }
         animation();
       }
-      if (this_mode == 6) animation();
+      //if (this_mode == 6) animation();
 
       if (!IRLremote.receiving())    // если на ИК приёмник не приходит сигнал (без этого НЕ РАБОТАЕТ!)
         FastLED.show();         // отправить значения на ленту

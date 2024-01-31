@@ -23,7 +23,7 @@ void perlin(int hue_s) {
 #if TRACKING_SILENCE == 1
     if (silence_IR_flag) {
       VUAnalysis();
-      c = map(Rlenght, 0, MAX_CH, BACKLIGHT_PERLIN_SPEED, BACKLIGHT_PERLIN_SPEED + 30);
+      if (Rlenght >= 1) c = map(Rlenght, 0, MAX_CH, BACKLIGHT_PERLIN_SPEED, BACKLIGHT_PERLIN_SPEED + 30);
     }
 #endif
     counter += c;
@@ -51,11 +51,13 @@ void ranningRainbow() {
 #if TRACKING_SILENCE == 1
     if (silence_IR_flag) {
       VUAnalysis();
-      if (RAINBOW_PERIOD > 0) this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD + 3);
-      else this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD - 3);
+      if ((RAINBOW_PERIOD > 0) && (Rlenght >= 1)) this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD + 3);
+      else if ((Rlenght >= 1)) this_color += map(Rlenght, 0, MAX_CH, RAINBOW_PERIOD, RAINBOW_PERIOD - 3);
+      else this_color += RAINBOW_PERIOD;
     }
+#elif this_color += RAINBOW_PERIOD;
 #endif
-    this_color += RAINBOW_PERIOD;
+
 
     if (this_color > 255) this_color = 0;
     if (this_color < 0) this_color = 255;
